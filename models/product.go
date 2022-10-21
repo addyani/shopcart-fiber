@@ -47,3 +47,17 @@ func DeleteProductById(db *gorm.DB, product *Product, id int) (err error) {
 
 	return nil
 }
+func ReadProductByUser(db *gorm.DB, product *[]Product, user string) (err error) {
+	err = db.Where("owner=?", user).Find(product).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func ReadProductByNoUser(db *gorm.DB, product *[]Product, user string) (err error) {
+	err = db.Where("owner!=?", user).Find(product).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
