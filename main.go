@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/html"
 
 	"ilmudata/task1/controllers"
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	// session
-	//store := session.New()
+	store := session.New()
 
 	// load template engine
 	engine := html.New("./views", ".html")
@@ -26,7 +27,7 @@ func main() {
 	// controllers
 	// helloController := controllers.InitHelloController(store)
 	prodController := controllers.InitProductController()
-	//userController := controllers.InitUserController(store)
+	userController := controllers.InitUserController(store)
 	//authController := controllers.InitAuthController(store)
 
 	// p := app.Group("/greetings")
@@ -35,7 +36,7 @@ func main() {
 	// p.Get("/myview", helloController.HelloView)
 
 	prod := app.Group("/products")
-	prod.Get("/", prodController.IndexProduct)
+	prod.Get("/", userController.AuthVerify, prodController.IndexProduct)
 	prod.Get("/create", prodController.AddProduct)
 	prod.Post("/create", prodController.AddPostedProduct)
 	prod.Get("/productdetail", prodController.GetDetailProduct)
@@ -43,6 +44,13 @@ func main() {
 	prod.Get("/editproduct/:id", prodController.EditlProduct)
 	prod.Post("/editproduct/:id", prodController.EditlPostedProduct)
 	prod.Get("/deleteproduct/:id", prodController.DeleteProduct)
+
+	user := app.Group("")
+	user.Get("/login", userController.Login)
+	user.Post("/login", userController.LoginPosted)
+	user.Get("/logout", userController.Logout)
+	user.Get("/register", userController.Register)
+	user.Post("/register", userController.AddRegisteredUser)
 
 	// //app.Get("/testing", userController.userTest)
 
