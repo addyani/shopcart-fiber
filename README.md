@@ -1,2 +1,2 @@
-# shopchart-fiber
+# shopcart-fiber
 Intro Go-Lang with fiber
