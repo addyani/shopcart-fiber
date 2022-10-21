@@ -12,11 +12,6 @@ import (
 	"ilmudata/task1/models"
 )
 
-// type ProductForm struct {
-// 	Email string `form:"email" validate:"required"`
-// 	Address string `form:"address" validate:"required"`
-// }
-
 type ProductController struct {
 	// declare variables
 	Db *gorm.DB
@@ -42,10 +37,71 @@ func (controller *ProductController) IndexProduct(c *fiber.Ctx) error {
 	})
 }
 
+// GET /products
+func (controller *ProductController) IndexxProduct(c *fiber.Ctx) error {
+	// load all products
+	var products []models.Product
+	var user models.User
+	id := c.Params("id")
+	idn, _ := strconv.Atoi(id)
+
+	errs := models.FindUserById(controller.Db, &user, idn)
+	if errs != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
+
+	errss := models.ReadProductByNoUser(controller.Db, &products, user.Username)
+	if errss != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
+	//if succeed
+	return c.Render("products", fiber.Map{
+		"Title":    "Rincian",
+		"Users":    user,
+		"Products": products,
+	})
+}
+
+// GET /products
+func (controller *ProductController) IndexxxProduct(c *fiber.Ctx) error {
+	// load all products
+	var products []models.Product
+	var user models.User
+	id := c.Params("id")
+	idn, _ := strconv.Atoi(id)
+
+	errs := models.FindUserById(controller.Db, &user, idn)
+	if errs != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
+
+	errss := models.ReadProductByUser(controller.Db, &products, user.Username)
+	if errss != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
+	//if succeed
+	return c.Render("products", fiber.Map{
+		"Title":    "Rincian",
+		"Users":    user,
+		"Products": products,
+	})
+}
+
 // GET /products/create
 func (controller *ProductController) AddProduct(c *fiber.Ctx) error {
+	id := c.Params("id")
+	idn, _ := strconv.Atoi(id)
+	var user models.User
+
+	// Find user
+	errs := models.FindUserById(controller.Db, &user, idn)
+	if errs != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
+
 	return c.Render("addproduct", fiber.Map{
 		"Title": "Tambah Produk",
+		"users": user,
 	})
 }
 
@@ -53,6 +109,10 @@ func (controller *ProductController) AddProduct(c *fiber.Ctx) error {
 func (controller *ProductController) AddPostedProduct(c *fiber.Ctx) error {
 	//myform := new(models.Product)
 	var myform models.Product
+
+	id := c.Params("id")
+	idn, _ := strconv.Atoi(id)
+	var user models.User
 
 	if form, err := c.MultipartForm(); err == nil {
 		// => *multipart.Form
@@ -87,8 +147,23 @@ func (controller *ProductController) AddPostedProduct(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Redirect("/products")
 	}
+
+	errs := models.FindUserById(controller.Db, &user, idn)
+	if errs != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
+
+	var products []models.Product
+	errss := models.ReadProductByUser(controller.Db, &products, user.Username)
+	if errss != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
 	// if succeed
-	return c.Redirect("/products")
+	return c.Render("products", fiber.Map{
+		"Title":    "Rincian",
+		"users":    user,
+		"Products": products,
+	})
 }
 
 // GET /products/productdetail?id=xxx

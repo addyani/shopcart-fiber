@@ -96,7 +96,10 @@
               <a class="nav-link" href="/logout">Logout</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/products/create">Tambah Produk</a>
+              <a class="nav-link" href="/products/create/{{.Users.Id}}">Tambah Produk</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/products/user/{{.Users.Id}}">Produk Saya</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">CheckOut</a>

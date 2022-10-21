@@ -1,9 +1,12 @@
 {{template "partials/header" .}}
 
-<h1>Daftar Produk</h1>
+<h1>Welcome {{.Users.Name}}</h1>
 <br>
-<a href="/products/create" class="btn btn-primary">Tambah Produk</a>
+<h2>Daftar Produk</h2> 
+<br>
+<a href="/products/create/{{.Users.Id}}" class="btn btn-primary">Tambah Produk</a>
 <div>
+	
 	<table class="table table-striped">
 		<thead>
 		  <tr>
@@ -15,6 +18,7 @@
 			<th scope="col">Harga</th>
 			<th scope="col">Owner</th>
 			<th scope="col">Detail</th>
+			<th scope="col">Add To Cart</th>
 		  </tr>
 		</thead>
 		<tbody>

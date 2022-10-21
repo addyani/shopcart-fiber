@@ -13,6 +13,11 @@ type User struct {
 	Password string `form:"password" json:"password" validate:"required"`
 }
 
+type LoginForm struct {
+	Username string `form:"username" json:"username" validate:"required"`
+	Password string `form:"password" json:"password" validate:"required"`
+}
+
 // CRUD
 // func CreateUser(db *gorm.DB, newUser *User) (err error) {
 // 	err = db.Create(newUser).Error
@@ -56,6 +61,14 @@ func CreateUser(db *gorm.DB, newUser *User) (err error) {
 
 func FindUserByUsername(db *gorm.DB, user *User, username string) (err error) {
 	err = db.Where("username=?", username).First(user).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func FindUserById(db *gorm.DB, user *User, id int) (err error) {
+	err = db.Where("id=?", id).First(user).Error
 	if err != nil {
 		return err
 	}

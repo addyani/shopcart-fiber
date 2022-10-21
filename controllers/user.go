@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"gorm.io/gorm"
@@ -10,11 +12,6 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 )
-
-type LoginForm struct {
-	Username string `form:"username" json:"username" validate:"required"`
-	Password string `form:"password" json:"password" validate:"required"`
-}
 
 type UserController struct {
 	// declare variables
@@ -41,7 +38,7 @@ func (controller *UserController) LoginPosted(c *fiber.Ctx) error {
 		panic(err)
 	}
 	var user models.User
-	var myform LoginForm
+	var myform models.LoginForm
 
 	if err := c.BodyParser(&myform); err != nil {
 		return c.Redirect("/login")
@@ -57,10 +54,11 @@ func (controller *UserController) LoginPosted(c *fiber.Ctx) error {
 	compare := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(myform.Password))
 	if compare == nil { // compare == nil artinya hasil compare di atas true
 		sess.Set("username", user.Username)
-		sess.Set("userId", user.ID)
+		sess.Set("userId", user.Id)
 		sess.Save()
 
-		return c.Redirect("/products")
+		idn := strconv.FormatUint(uint64(user.Id), 10)
+		return c.Redirect("/products/" + idn)
 	}
 
 	return c.Redirect("/login")
