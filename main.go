@@ -26,25 +26,20 @@ func main() {
 
 	// controllers
 	// helloController := controllers.InitHelloController(store)
-	prodController := controllers.InitProductController()
+	prodController := controllers.InitProductController(store)
 	userController := controllers.InitUserController(store)
 	//authController := controllers.InitAuthController(store)
 
-	// p := app.Group("/greetings")
-	// p.Get("/", helloController.Greeting)
-	// p.Get("/hello", helloController.SayHello)
-	// p.Get("/myview", helloController.HelloView)
-
 	prod := app.Group("/products")
 	prod.Get("/", prodController.IndexProduct)
-	prod.Get("/:id", prodController.IndexxProduct)
-	prod.Get("/user/:id", prodController.IndexxxProduct)
-	prod.Get("/create/:id", prodController.AddProduct)
-	prod.Post("/create/:id", prodController.AddPostedProduct)
-	prod.Get("/detail/:id", prodController.GetDetailProduct2)
-	prod.Get("/editproduct/:id", prodController.EditlProduct)
-	prod.Post("/editproduct/:id", prodController.EditlPostedProduct)
-	prod.Get("/deleteproduct/:id", prodController.DeleteProduct)
+	prod.Get("/:id", userController.AuthVerify, prodController.IndexxProduct)
+	prod.Get("/user/:id", userController.AuthVerify, prodController.IndexxxProduct)
+	prod.Get("/create/:id", userController.AuthVerify, prodController.AddProduct)
+	prod.Post("/create/:id", userController.AuthVerify, prodController.AddPostedProduct)
+	prod.Get("/detail/:id", userController.AuthVerify, prodController.GetDetailProduct2)
+	prod.Get("/editproduct/:id", userController.AuthVerify, prodController.EditlProduct)
+	prod.Post("/editproduct/:id", userController.AuthVerify, prodController.EditlPostedProduct)
+	prod.Get("/deleteproduct/:id", userController.AuthVerify, prodController.DeleteProduct)
 
 	user := app.Group("")
 	user.Get("/login", userController.Login)
@@ -52,6 +47,9 @@ func main() {
 	user.Get("/logout", userController.Logout)
 	user.Get("/register", userController.Register)
 	user.Post("/register", userController.AddRegisteredUser)
+
+	user.Get("/testing1", prodController.GetProductUser)
+	user.Get("/testing2/:id", prodController.GetProductUser2)
 
 	// //app.Get("/testing", userController.userTest)
 

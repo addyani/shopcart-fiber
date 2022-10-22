@@ -6,11 +6,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Id       int    `form:"id" json:"id" validate:"required"`
-	Name     string `form:"name" json:"name" validate:"required"`
-	Email    string `form:"email" json:"email" validate:"required"`
-	Username string `form:"username" json:"username" validate:"required"`
-	Password string `form:"password" json:"password" validate:"required"`
+	Id       int        `form:"id" json:"id" validate:"required"`
+	Name     string     `form:"name" json:"name" validate:"required"`
+	Email    string     `form:"email" json:"email" validate:"required"`
+	Username string     `form:"username" json:"username" validate:"required"`
+	Password string     `form:"password" json:"password" validate:"required"`
+	Products *[]Product `gorm:"foreignKey:UserRefer"`
 }
 
 type LoginForm struct {
@@ -74,3 +75,12 @@ func FindUserById(db *gorm.DB, user *User, id int) (err error) {
 	}
 	return nil
 }
+
+// func GetAllProduct(db *gorm.DB, product *[]Product) (err error) {
+// 	var products []Product
+// 	err = db.Model(&Product{}).Preload("Users").Find(&products).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }

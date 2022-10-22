@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"gorm.io/gorm"
 
 	"ilmudata/task1/database"
@@ -14,12 +15,13 @@ import (
 
 type ProductController struct {
 	// declare variables
-	Db *gorm.DB
+	Db    *gorm.DB
+	store *session.Store
 }
 
-func InitProductController() *ProductController {
+func InitProductController(s *session.Store) *ProductController {
 	db := database.InitDb()
-	return &ProductController{Db: db}
+	return &ProductController{Db: db, store: s}
 }
 
 // routing
@@ -37,6 +39,50 @@ func (controller *ProductController) IndexProduct(c *fiber.Ctx) error {
 	})
 }
 
+// func (controller *ProductController) GetUserProduct(c *fiber.Ctx) error {
+// 	// load all products
+// 	var users []models.User
+// 	err := models.GetAllUser(controller.Db, &users)
+// 	if err != nil {
+// 		return c.SendStatus(500) // http 500 internal server error
+// 	}
+// 	return c.JSON(fiber.Map{
+// 		"Title":    "Daftar Produk",
+// 		"Products": users,
+// 	})
+// }
+
+// Testing
+func (controller *ProductController) GetProductUser(c *fiber.Ctx) error {
+	// load all products
+	var users []models.User
+	err := models.GetAllProduct(controller.Db, &users)
+	if err != nil {
+		return c.SendStatus(500) // http 500 internal server error
+	}
+	return c.JSON(fiber.Map{
+		"Title": "Daftar Produk",
+		"nilai": users,
+	})
+}
+
+// Testing
+func (controller *ProductController) GetProductUser2(c *fiber.Ctx) error {
+	// load all products
+	var users models.User
+	id := c.Params("id")
+	idn, _ := strconv.Atoi(id)
+
+	err := models.GetAllProductUser(controller.Db, &users, idn)
+	if err != nil {
+		return c.SendStatus(500) // http 500 internal server error
+	}
+	return c.JSON(fiber.Map{
+		"Title": "Daftar Produk",
+		"nilai": users,
+	})
+}
+
 // GET /products
 func (controller *ProductController) IndexxProduct(c *fiber.Ctx) error {
 	// load all products
@@ -50,13 +96,19 @@ func (controller *ProductController) IndexxProduct(c *fiber.Ctx) error {
 		return c.Redirect("/login") // Unsuccessful login (cannot find user)
 	}
 
-	errss := models.ReadProductByNoUser(controller.Db, &products, user.Username)
+	errss := models.ReadProductByNoUser(controller.Db, &products, user.Name)
 	if errss != nil {
 		return c.Redirect("/login") // Unsuccessful login (cannot find user)
 	}
+
+	// for _, s := range *&products {
+	// 	s.IdUser = idn
+	// 	fmt.Println(s.IdUser)
+	// }
+
 	//if succeed
 	return c.Render("products", fiber.Map{
-		"Title":    "Rincian",
+		"Title":    "Produk Di Toko Lain",
 		"Users":    user,
 		"Products": products,
 	})
@@ -65,25 +117,31 @@ func (controller *ProductController) IndexxProduct(c *fiber.Ctx) error {
 // GET /products
 func (controller *ProductController) IndexxxProduct(c *fiber.Ctx) error {
 	// load all products
-	var products []models.Product
-	var user models.User
+	var users models.User
 	id := c.Params("id")
 	idn, _ := strconv.Atoi(id)
 
-	errs := models.FindUserById(controller.Db, &user, idn)
-	if errs != nil {
-		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	// var product models.Product
+	// product.IdUser = idn
+	// models.UpdateProduct(controller.Db, &product)
+
+	err := models.GetAllProductUser(controller.Db, &users, idn)
+	if err != nil {
+		return c.SendStatus(500) // http 500 internal server error
 	}
 
-	errss := models.ReadProductByUser(controller.Db, &products, user.Username)
-	if errss != nil {
-		return c.Redirect("/login") // Unsuccessful login (cannot find user)
-	}
+	// odd := *users.Products.IdUser
+	// m := map[string]int{users.Products.IdUser}
+	// for _, s := range *users.Products {
+	// 	s.IdUser = idn
+	// 	fmt.Println(s.IdUser)
+	// }
+
 	//if succeed
 	return c.Render("products", fiber.Map{
 		"Title":    "Rincian",
-		"Users":    user,
-		"Products": products,
+		"Users":    users,
+		"Products": users.Products,
 	})
 }
 
@@ -142,28 +200,23 @@ func (controller *ProductController) AddPostedProduct(c *fiber.Ctx) error {
 		return c.Redirect("/products")
 	}
 
+	errs := models.FindUserById(controller.Db, &user, idn)
+	if errs != nil {
+		return c.Redirect("/login") // Unsuccessful login (cannot find user)
+	}
+
+	myform.Owner = (user.Name)
+	myform.UserRefer = uint(user.Id)
+
 	// save product
 	err := models.CreateProduct(controller.Db, &myform)
 	if err != nil {
 		return c.Redirect("/products")
 	}
 
-	errs := models.FindUserById(controller.Db, &user, idn)
-	if errs != nil {
-		return c.Redirect("/login") // Unsuccessful login (cannot find user)
-	}
-
-	var products []models.Product
-	errss := models.ReadProductByUser(controller.Db, &products, user.Username)
-	if errss != nil {
-		return c.Redirect("/login") // Unsuccessful login (cannot find user)
-	}
 	// if succeed
-	return c.Render("products", fiber.Map{
-		"Title":    "Rincian",
-		"users":    user,
-		"Products": products,
-	})
+	idns := strconv.FormatUint(uint64(user.Id), 10)
+	return c.Redirect("/products/" + idns)
 }
 
 // GET /products/productdetail?id=xxx
@@ -192,9 +245,17 @@ func (controller *ProductController) GetDetailProduct2(c *fiber.Ctx) error {
 	if err != nil {
 		return c.SendStatus(500) // http 500 internal server error
 	}
+
+	sess, err := controller.store.Get(c)
+	if err != nil {
+		panic(err)
+	}
+	val := sess.Get("userId")
+
 	return c.Render("productdetail", fiber.Map{
 		"Title":   "Detail Produk",
 		"Product": product,
+		"UserId":  val,
 	})
 }
 
@@ -208,9 +269,17 @@ func (controller *ProductController) EditlProduct(c *fiber.Ctx) error {
 	if err != nil {
 		return c.SendStatus(500) // http 500 internal server error
 	}
+
+	sess, err := controller.store.Get(c)
+	if err != nil {
+		panic(err)
+	}
+	val := sess.Get("userId")
+
 	return c.Render("editproduct", fiber.Map{
 		"Title":   "Edit Produk",
 		"Product": product,
+		"UserId":  val,
 	})
 }
 
@@ -262,7 +331,20 @@ func (controller *ProductController) EditlPostedProduct(c *fiber.Ctx) error {
 	// save product
 	models.UpdateProduct(controller.Db, &product)
 
-	return c.Redirect("/products")
+	sess, err := controller.store.Get(c)
+	if err != nil {
+		panic(err)
+	}
+	val := sess.Get("username").(string)
+
+	var users models.User
+	errs := models.FindUserByUsername(controller.Db, &users, val)
+	if errs != nil {
+		return c.SendStatus(500) // http 500 internal server error
+	}
+
+	convert := strconv.Itoa(users.Id)
+	return c.Redirect("/products/" + convert)
 
 }
 
@@ -273,5 +355,19 @@ func (controller *ProductController) DeleteProduct(c *fiber.Ctx) error {
 
 	var product models.Product
 	models.DeleteProductById(controller.Db, &product, idn)
-	return c.Redirect("/products")
+
+	sess, err := controller.store.Get(c)
+	if err != nil {
+		panic(err)
+	}
+	val := sess.Get("username").(string)
+
+	var users models.User
+	errs := models.FindUserByUsername(controller.Db, &users, val)
+	if errs != nil {
+		return c.SendStatus(500) // http 500 internal server error
+	}
+
+	convert := strconv.Itoa(users.Id)
+	return c.Redirect("/products/" + convert)
 }
