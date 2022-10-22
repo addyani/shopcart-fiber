@@ -13,6 +13,7 @@ type Product struct {
 	Quantity  int     `form:"quantity" json:"quantity" validate:"required"`
 	Price     float32 `form:"price" json:"price" validate:"required"`
 	Owner     string  `form:"owner" json:"owner" validate:"required"`
+	UserRefer uint    `gorm:"foreignKey:UserRefer"`
 }
 
 // CRUD
@@ -47,15 +48,39 @@ func DeleteProductById(db *gorm.DB, product *Product, id int) (err error) {
 
 	return nil
 }
-func ReadProductByUser(db *gorm.DB, product *[]Product, user string) (err error) {
-	err = db.Where("owner=?", user).Find(product).Error
+
+func ReadProductByNoUser(db *gorm.DB, product *[]Product, name string) (err error) {
+	err = db.Where("owner!=?", name).Find(product).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func ReadProductByNoUser(db *gorm.DB, product *[]Product, user string) (err error) {
-	err = db.Where("owner!=?", user).Find(product).Error
+
+// func GetAllUser(db *gorm.DB, user *[]User) (err error) {
+// 	var users []User
+// 	err = db.Model(&User{}).Preload("Product").Find(&users).Error
+// 	// return users, err
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
+func GetAllProduct(db *gorm.DB, users *[]User) (err error) {
+	//var users *[]User
+	err = db.Model(users).Preload("Products").Find(users).Error
+	//err = db.Find(users).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetAllProductUser(db *gorm.DB, users *User, id int) (err error) {
+	//var users *[]User
+	err = db.Model(users).Preload("Products").Where("id=?", id).Find(users).Error
+	//err = db.Find(users).Error
 	if err != nil {
 		return err
 	}

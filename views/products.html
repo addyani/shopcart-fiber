@@ -2,7 +2,7 @@
 
 <h1>Welcome {{.Users.Name}}</h1>
 <br>
-<h2>Daftar Produk</h2> 
+<h2>{{.Title}}</h2> 
 <br>
 <a href="/products/create/{{.Users.Id}}" class="btn btn-primary">Tambah Produk</a>
 <div>
@@ -18,11 +18,10 @@
 			<th scope="col">Harga</th>
 			<th scope="col">Owner</th>
 			<th scope="col">Detail</th>
-			<th scope="col">Add To Cart</th>
 		  </tr>
 		</thead>
 		<tbody>
-			{{range .Products}}
+			{{range .Products}} 
 			<tr>
 				<th scope="row">{{.Id}}</th>
 				<td><img class="rounded mx-auto d-block " src="..\public\images\{{.Image}}" height="100" width="100" alt=""></td>
@@ -34,10 +33,6 @@
 				<td>
 					<a href="/products/detail/{{.Id}}" class="btn btn-outline-info">
 							Detail</a>
-				</td>
-				<td>
-					<a href="/products/detail/{{.Id}}" class="btn btn-outline-info">
-							CheckOut</a>
 				</td>
 			</tr>
 		  {{end}}
