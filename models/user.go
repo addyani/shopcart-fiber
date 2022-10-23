@@ -11,7 +11,8 @@ type User struct {
 	Email    string     `form:"email" json:"email" validate:"required"`
 	Username string     `form:"username" json:"username" validate:"required"`
 	Password string     `form:"password" json:"password" validate:"required"`
-	Products *[]Product `gorm:"foreignKey:UserRefer"`
+	Products []*Product `gorm:"foreignKey:UserIdProduct"`
+	Carts    []*Cart    `gorm:"foreignKey:UserIdCart"`
 }
 
 type LoginForm struct {

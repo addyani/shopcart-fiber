@@ -16,7 +16,7 @@
 	<a href="/products/{{.UserId}}" class="btn btn-primary">Back</a> &nbsp; 
 	<a href="/products/deleteproduct/{{.Product.Id}}" class="btn btn-danger">Hapus</a>  &nbsp; 
 	<a href="/products/editproduct/{{.Product.Id}}" class="btn btn-info">Edit</a> &nbsp; 
-	<a href="/products/cart/{{.UserId}}/product/{{.Product.Id}}" class="btn btn-outline-info">CheckOut</a>
+	<a href="/cart/{{.UserId}}/product/{{.Product.Id}}" class="btn btn-outline-info">CheckOut</a>
 </div>
 
 {{template "partials/footer" .}}
