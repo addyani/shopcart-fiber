@@ -28,6 +28,12 @@ type CartProduct struct {
 	// product_id uint `gorm:"foreignKey:product_id"`
 	IdForCart    int
 	IdForProduct int
+	Image        string
+	Name         string
+	Deskripsi    string
+	Quantity     int
+	Price        float32
+	Owner        string
 	Jumlah       int     `form:"jumlah" json:"jumlah" validate:"required"`
 	Harga        float32 `form:"harga" json:"harga" validate:"required"`
 }
@@ -50,7 +56,8 @@ func CreateCart(db *gorm.DB, newCart *Cart) (err error) {
 }
 
 func ReadCartById(db *gorm.DB, cart *Cart, id int) (err error) {
-	err = db.Where("user_id_cart=?", id).First(cart).Error
+	//err = db.Model(users).Preload("Products").Where("id=?", id).Find(users).Error
+	err = db.Model(cart).Preload("Products").Where("user_id_cart=?", id).First(cart).Error
 	if err != nil {
 		return err
 	}
@@ -85,6 +92,14 @@ func UpdateCart(db *gorm.DB, updateCart *CartProduct, cart uint, prod uint) (err
 
 func FindCart(db *gorm.DB, findCart *[]CartProduct, cart uint) (err error) {
 	err = db.Where("cart_id=?", cart).Find(findCart).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteCart(db *gorm.DB, deleteCart *CartProduct, cart uint, prod uint) (err error) {
+	err = db.Where("cart_id=?", cart).Where("product_id=?", prod).Delete(deleteCart).Error
 	if err != nil {
 		return err
 	}

@@ -45,6 +45,9 @@ func main() {
 	cart := app.Group("/cart")
 	cart.Get("/:id", cartController.GetCart)
 	cart.Get("/:cartid/product/:productid", cartController.AddCart)
+	cart.Get("/:cartid/product/:productid/redirect", cartController.AddCartInCart)
+	cart.Get("/:cartid/product/:productid/kurang", cartController.MinusInCart)
+	cart.Get("/:cartid/product/:productid/batal", cartController.DeleteInCart)
 
 	user := app.Group("")
 	user.Get("/login", userController.Login)
