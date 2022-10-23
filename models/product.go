@@ -6,14 +6,20 @@ import (
 
 type Product struct {
 	gorm.Model
-	Id        int     `form:"id" json:"id" validate:"required"`
-	Image     string  `form:"image" json:"image" validate:"required"`
-	Name      string  `form:"name" json:"name" validate:"required"`
-	Deskripsi string  `form:"desc" json:"desc" validate:"required"`
-	Quantity  int     `form:"quantity" json:"quantity" validate:"required"`
-	Price     float32 `form:"price" json:"price" validate:"required"`
-	Owner     string  `form:"owner" json:"owner" validate:"required"`
-	UserRefer uint    `gorm:"foreignKey:UserRefer"`
+	Id            int     `form:"id" json:"id" validate:"required"`
+	Image         string  `form:"image" json:"image" validate:"required"`
+	Name          string  `form:"name" json:"name" validate:"required"`
+	Deskripsi     string  `form:"desc" json:"desc" validate:"required"`
+	Quantity      int     `form:"quantity" json:"quantity" validate:"required"`
+	Price         float32 `form:"price" json:"price" validate:"required"`
+	Owner         string  `form:"owner" json:"owner" validate:"required"`
+	UserIdProduct uint    `gorm:"foreignKey:UserIdProduct"`
+	//Jumlah        int     `form:"jumlah" json:"jumlah" gorm:"primaryKey"`
+	//Harga         float32 `form:"harga" json:"harga" gorm:"primaryKey"`
+	//CartIdProduct uint    `gorm:"many2many:cart_product;foreignKey:CartIdProduct"`
+	//Carts *[]Cart `gorm:"many2many:cart_product;foreignKey:ProductIdCart"`
+	// CartIdProduct uint `gorm:"index:null,unique"`
+	Carts []*Cart `gorm:"many2many:CartProduct;"`
 }
 
 // CRUD

@@ -28,7 +28,8 @@ func main() {
 	// helloController := controllers.InitHelloController(store)
 	prodController := controllers.InitProductController(store)
 	userController := controllers.InitUserController(store)
-	//authController := controllers.InitAuthController(store)
+	cartController := controllers.InitCartController(store)
+	testingController := controllers.InitTestingController()
 
 	prod := app.Group("/products")
 	prod.Get("/", prodController.IndexProduct)
@@ -41,6 +42,10 @@ func main() {
 	prod.Post("/editproduct/:id", userController.AuthVerify, prodController.EditlPostedProduct)
 	prod.Get("/deleteproduct/:id", userController.AuthVerify, prodController.DeleteProduct)
 
+	cart := app.Group("/cart")
+	cart.Get("/:id", cartController.GetCart)
+	cart.Get("/:cartid/product/:productid", cartController.AddCart)
+
 	user := app.Group("")
 	user.Get("/login", userController.Login)
 	user.Post("/login", userController.LoginPosted)
@@ -48,8 +53,9 @@ func main() {
 	user.Get("/register", userController.Register)
 	user.Post("/register", userController.AddRegisteredUser)
 
-	user.Get("/testing1", prodController.GetProductUser)
-	user.Get("/testing2/:id", prodController.GetProductUser2)
+	test := app.Group("/testing")
+	test.Post("/create/:id", testingController.PostAddProd)
+	test.Post("/allcart", testingController.GetAllCart)
 
 	// //app.Get("/testing", userController.userTest)
 

@@ -74,7 +74,7 @@ func (controller *UserController) Register(c *fiber.Ctx) error {
 // POST /register
 func (controller *UserController) AddRegisteredUser(c *fiber.Ctx) error {
 	var user models.User
-	// var cart models.Cart
+	var cart models.Cart
 
 	if err := c.BodyParser(&user); err != nil {
 		return c.SendStatus(400) // Bad Request, RegisterForm is not complete
@@ -84,7 +84,7 @@ func (controller *UserController) AddRegisteredUser(c *fiber.Ctx) error {
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	sHash := string(bytes)
 
-	// Simpan hashing, bukan plain passwordnya
+	// Add hash password to db user password
 	user.Password = sHash
 
 	// save user
@@ -99,11 +99,12 @@ func (controller *UserController) AddRegisteredUser(c *fiber.Ctx) error {
 		return c.SendStatus(500) // Server error, gagal menyimpan user
 	}
 
-	// // also create cart
-	// errCart := models.CreateCart(controller.Db, &cart, user.ID)
-	// if errCart != nil {
-	// 	return c.SendStatus(500) // Server error, gagal menyimpan user
-	// }
+	cart.UserIdCart = uint(user.Id)
+	//create create cart
+	errCart := models.CreateCart(controller.Db, &cart)
+	if errCart != nil {
+		return c.SendStatus(500) // Server error, gagal menyimpan user
+	}
 
 	// if succeed
 	return c.Redirect("/login")

@@ -39,50 +39,6 @@ func (controller *ProductController) IndexProduct(c *fiber.Ctx) error {
 	})
 }
 
-// func (controller *ProductController) GetUserProduct(c *fiber.Ctx) error {
-// 	// load all products
-// 	var users []models.User
-// 	err := models.GetAllUser(controller.Db, &users)
-// 	if err != nil {
-// 		return c.SendStatus(500) // http 500 internal server error
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"Title":    "Daftar Produk",
-// 		"Products": users,
-// 	})
-// }
-
-// Testing
-func (controller *ProductController) GetProductUser(c *fiber.Ctx) error {
-	// load all products
-	var users []models.User
-	err := models.GetAllProduct(controller.Db, &users)
-	if err != nil {
-		return c.SendStatus(500) // http 500 internal server error
-	}
-	return c.JSON(fiber.Map{
-		"Title": "Daftar Produk",
-		"nilai": users,
-	})
-}
-
-// Testing
-func (controller *ProductController) GetProductUser2(c *fiber.Ctx) error {
-	// load all products
-	var users models.User
-	id := c.Params("id")
-	idn, _ := strconv.Atoi(id)
-
-	err := models.GetAllProductUser(controller.Db, &users, idn)
-	if err != nil {
-		return c.SendStatus(500) // http 500 internal server error
-	}
-	return c.JSON(fiber.Map{
-		"Title": "Daftar Produk",
-		"nilai": users,
-	})
-}
-
 // GET /products
 func (controller *ProductController) IndexxProduct(c *fiber.Ctx) error {
 	// load all products
@@ -121,21 +77,10 @@ func (controller *ProductController) IndexxxProduct(c *fiber.Ctx) error {
 	id := c.Params("id")
 	idn, _ := strconv.Atoi(id)
 
-	// var product models.Product
-	// product.IdUser = idn
-	// models.UpdateProduct(controller.Db, &product)
-
 	err := models.GetAllProductUser(controller.Db, &users, idn)
 	if err != nil {
 		return c.SendStatus(500) // http 500 internal server error
 	}
-
-	// odd := *users.Products.IdUser
-	// m := map[string]int{users.Products.IdUser}
-	// for _, s := range *users.Products {
-	// 	s.IdUser = idn
-	// 	fmt.Println(s.IdUser)
-	// }
 
 	//if succeed
 	return c.Render("products", fiber.Map{
@@ -206,7 +151,7 @@ func (controller *ProductController) AddPostedProduct(c *fiber.Ctx) error {
 	}
 
 	myform.Owner = (user.Name)
-	myform.UserRefer = uint(user.Id)
+	myform.UserIdProduct = uint(user.Id)
 
 	// save product
 	err := models.CreateProduct(controller.Db, &myform)
