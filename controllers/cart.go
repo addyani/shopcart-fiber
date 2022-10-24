@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -56,19 +55,19 @@ func (controller *CartController) GetCart(c *fiber.Ctx) error {
 		return c.Redirect("/login") // Unsuccessful login (cannot find user)
 	}
 
-	return c.JSON(fiber.Map{
-		"Title":    "Keranjang",
-		"Users":    user,
-		"CartUser": carts,
-		"Carts":    cartsFK,
-	})
-
-	// return c.Render("cart", fiber.Map{
+	// return c.JSON(fiber.Map{
 	// 	"Title":    "Keranjang",
 	// 	"Users":    user,
 	// 	"CartUser": carts,
 	// 	"Carts":    cartsFK,
 	// })
+
+	return c.Render("cart", fiber.Map{
+		"Title":    "Keranjang",
+		"Users":    user,
+		"CartUser": carts,
+		"Carts":    cartsFK,
+	})
 }
 
 // GET /products
@@ -316,17 +315,17 @@ func (controller *CartController) CekOutCart(c *fiber.Ctx) error {
 	}
 
 	for _, num := range cartsFK {
-		fmt.Println(num.Deskripsi)
-		fmt.Println(num.IdForCart)
-		fmt.Println(num.IdForProduct)
-		fmt.Println(num.Image)
-		fmt.Println(num.Name)
-		fmt.Println(num.Owner)
-		fmt.Println(num.Quantity)
-		fmt.Println(num.Jumlah)
-		fmt.Println(num.Price)
-		fmt.Println(num.Harga)
-		fmt.Println("..................")
+		// fmt.Println(num.Deskripsi)
+		// fmt.Println(num.IdForCart)
+		// fmt.Println(num.IdForProduct)
+		// fmt.Println(num.Image)
+		// fmt.Println(num.Name)
+		// fmt.Println(num.Owner)
+		// fmt.Println(num.Quantity)
+		// fmt.Println(num.Jumlah)
+		// fmt.Println(num.Price)
+		// fmt.Println(num.Harga)
+		// fmt.Println("..................")
 		var product models.Product
 		err := models.ReadProductById(controller.Db, &product, num.IdForProduct)
 		if err != nil {
@@ -336,7 +335,7 @@ func (controller *CartController) CekOutCart(c *fiber.Ctx) error {
 		}
 
 		var historyy models.History
-		errsss := models.ReadHistoryById(controller.Db, &historyy, uint(idn))
+		errsss := models.ReadHistoryByIdUser(controller.Db, &historyy, uint(idn))
 		if errsss != nil {
 			return c.JSON(fiber.Map{
 				"Title": "Ke4",
@@ -389,9 +388,9 @@ func (controller *CartController) CekOutCart(c *fiber.Ctx) error {
 			new.Harga = num.Harga
 		}
 
-		fmt.Println("Nilai Num CART", num.IdForCart)
-		fmt.Println("Nilai Num Product", num.IdForProduct)
-		fmt.Println("Nilai Num HISTORY", historyy.Id)
+		// fmt.Println("Nilai Num CART", num.IdForCart)
+		// fmt.Println("Nilai Num Product", num.IdForProduct)
+		// fmt.Println("Nilai Num HISTORY", historyy.Id)
 
 		ss := models.UpdateHistory(controller.Db, &new, uint(num.IdForProduct), uint(historyy.Id))
 		if ss != nil {
@@ -541,16 +540,16 @@ func (controller *CartController) CekOutCart(c *fiber.Ctx) error {
 	// idns := strconv.FormatUint(uint64(idn), 10)
 	// return c.Redirect("/history/" + idns)
 
-	return c.JSON(fiber.Map{
-		"Title":   "Ini",
-		"ccartFK": cartsFK,
-	})
+	// return c.JSON(fiber.Map{
+	// 	"Title":   "Ini",
+	// 	"ccartFK": cartsFK,
+	// })
 
 	// return c.Render("history", fiber.Map{
 	// 	"Title":   "List History",
 	// 	"ccartFK": cartsFK,
 	// })
 
-	// idns := strconv.FormatUint(uint64(CartId), 10)
-	// return c.Redirect("/history/" + idns)
+	idns := strconv.FormatUint(uint64(idn), 10)
+	return c.Redirect("/history/" + idns)
 }
