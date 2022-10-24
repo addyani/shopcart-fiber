@@ -29,26 +29,8 @@ func main() {
 	prodController := controllers.InitProductController(store)
 	userController := controllers.InitUserController(store)
 	cartController := controllers.InitCartController(store)
+	historyController := controllers.InitHistoryController(store)
 	testingController := controllers.InitTestingController()
-
-	prod := app.Group("/products")
-	prod.Get("/", prodController.IndexProduct)
-	prod.Get("/:id", prodController.IndexxProduct)
-	prod.Get("/user/:id", prodController.IndexxxProduct)
-	prod.Get("/create/:id", prodController.AddProduct)
-	prod.Post("/create/:id", prodController.AddPostedProduct)
-	prod.Get("/detail/:id", prodController.GetDetailProduct2)
-	prod.Get("/editproduct/:id", prodController.EditlProduct)
-	prod.Post("/editproduct/:id", prodController.EditlPostedProduct)
-	prod.Get("/deleteproduct/:id", prodController.DeleteProduct)
-
-	cart := app.Group("/cart")
-	cart.Get("/:id", cartController.GetCart)
-	cart.Get("/:cartid/product/:productid", cartController.AddCart)
-	cart.Get("/:cartid/product/:productid/redirect", cartController.AddCartInCart)
-	cart.Get("/:cartid/product/:productid/kurang", cartController.MinusInCart)
-	cart.Get("/:cartid/product/:productid/batal", cartController.DeleteInCart)
-	cart.Get("/cekout/:id", cartController.CekOutCart)
 
 	user := app.Group("")
 	user.Get("/login", userController.Login)
@@ -57,37 +39,32 @@ func main() {
 	user.Get("/register", userController.Register)
 	user.Post("/register", userController.AddRegisteredUser)
 
+	prod := app.Group("/products")
+	prod.Get("/", prodController.IndexProduct)
+	prod.Get("/:id", userController.AuthVerify, prodController.IndexxProduct)
+	prod.Get("/user/:id", userController.AuthVerify, prodController.IndexxxProduct)
+	prod.Get("/create/:id", userController.AuthVerify, prodController.AddProduct)
+	prod.Post("/create/:id", userController.AuthVerify, prodController.AddPostedProduct)
+	prod.Get("/detail/:id", userController.AuthVerify, prodController.GetDetailProduct2)
+	prod.Get("/editproduct/:id", userController.AuthVerify, prodController.EditlProduct)
+	prod.Post("/editproduct/:id", userController.AuthVerify, prodController.EditlPostedProduct)
+	prod.Get("/deleteproduct/:id", userController.AuthVerify, prodController.DeleteProduct)
+
+	cart := app.Group("/cart")
+	cart.Get("/:id", userController.AuthVerify, cartController.GetCart)
+	cart.Get("/:cartid/product/:productid", userController.AuthVerify, cartController.AddCart)
+	cart.Get("/:cartid/product/:productid/redirect", userController.AuthVerify, cartController.AddCartInCart)
+	cart.Get("/:cartid/product/:productid/kurang", userController.AuthVerify, cartController.MinusInCart)
+	cart.Get("/:cartid/product/:productid/batal", userController.AuthVerify, cartController.DeleteInCart)
+	cart.Get("/cekout/:id", userController.AuthVerify, cartController.CekOutCart)
+
+	history := app.Group("/history")
+	history.Get("/:id", userController.AuthVerify, historyController.GetHistory)
+	history.Get("user/:userid/detail/:id", userController.AuthVerify, historyController.GetDetailHistory)
+
 	test := app.Group("/testing")
 	test.Post("/create/:id", testingController.PostAddProd)
 	test.Post("/allcart", testingController.GetAllCart)
-
-	// //app.Get("/testing", userController.userTest)
-
-	// app.Get("/login", authController.Login)
-	// app.Post("/login", authController.LoginPosted)
-	// app.Get("/logout", authController.Logout)
-	// //app.Get("/profile",authController.Profile)
-
-	// // app.Use("/profile", func(c *fiber.Ctx) error {
-	// // 	sess,_ := store.Get(c)
-	// // 	val := sess.Get("username")
-	// // 	if val != nil {
-	// // 		return c.Next()
-	// // 	}
-
-	// // 	return c.Redirect("/login")
-
-	// // })
-	// app.Get("/profile", func(c *fiber.Ctx) error {
-	// 	sess, _ := store.Get(c)
-	// 	val := sess.Get("username")
-	// 	if val != nil {
-	// 		return c.Next()
-	// 	}
-
-	// 	return c.Redirect("/login")
-
-	// }, authController.Profile)
 
 	app.Listen(":3000")
 }
