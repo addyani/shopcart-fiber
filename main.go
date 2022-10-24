@@ -30,7 +30,6 @@ func main() {
 	userController := controllers.InitUserController(store)
 	cartController := controllers.InitCartController(store)
 	historyController := controllers.InitHistoryController(store)
-	testingController := controllers.InitTestingController()
 
 	user := app.Group("")
 	user.Get("/login", userController.Login)
@@ -61,10 +60,6 @@ func main() {
 	history := app.Group("/history")
 	history.Get("/:id", userController.AuthVerify, historyController.GetHistory)
 	history.Get("user/:userid/detail/:id", userController.AuthVerify, historyController.GetDetailHistory)
-
-	test := app.Group("/testing")
-	test.Post("/create/:id", testingController.PostAddProd)
-	test.Post("/allcart", testingController.GetAllCart)
 
 	app.Listen(":3000")
 }
