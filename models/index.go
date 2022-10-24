@@ -23,6 +23,8 @@ func InitDbModels() *DbModels {
 	db.AutoMigrate(&Cart{})
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&CartProduct{})
+	db.AutoMigrate(&History{})
+	db.AutoMigrate(&CartHistory{})
 
 	return &DbModels{Db: db}
 }

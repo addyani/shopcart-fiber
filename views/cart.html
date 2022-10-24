@@ -52,7 +52,7 @@
 	  </table>
 
       <h1>Harga Total = {{.CartUser.Total}}</h1>
-      <a href="/cekout" class="btn btn-primary">CekOut</a>
+      <a href="/cart/cekout/{{.Users.Id}}" class="btn btn-primary">CekOut</a>
 </div>
 
 {{template "partials/footer" .}}
