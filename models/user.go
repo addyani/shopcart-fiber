@@ -13,6 +13,7 @@ type User struct {
 	Password string     `form:"password" json:"password" validate:"required"`
 	Products []*Product `gorm:"foreignKey:UserIdProduct"`
 	Carts    []*Cart    `gorm:"foreignKey:UserIdCart"`
+	Historys []*History `gorm:"foreignKey:UserIdHistory"`
 }
 
 type LoginForm struct {
